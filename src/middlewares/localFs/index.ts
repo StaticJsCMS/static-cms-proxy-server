@@ -1,9 +1,9 @@
-import path from 'path';
+import path from "path";
 
-import { defaultSchema, joi } from '../joi';
-import { pathTraversal } from '../joi/customValidators';
-import { listRepoFiles, deleteFile, writeFile, move } from '../utils/fs';
-import { entriesFromFiles, readMediaFile } from '../utils/entries';
+import { defaultSchema, joi } from "../joi";
+import { pathTraversal } from "../joi/customValidators";
+import { listRepoFiles, deleteFile, writeFile, move } from "../utils/fs";
+import { entriesFromFiles, readMediaFile } from "../utils/entries";
 
 import type {
   EntriesByFolderParams,
@@ -16,9 +16,9 @@ import type {
   DeleteFileParams,
   DeleteFilesParams,
   DataFile,
-} from '../types';
-import type express from 'express';
-import type winston from 'winston';
+} from "../types";
+import type express from "express";
+import type winston from "winston";
 
 type FsOptions = {
   repoPath: string;
@@ -31,98 +31,89 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
       const { body } = req;
 
       switch (body.action) {
-        case 'info': {
+        case "info": {
           res.json({
             repo: path.basename(repoPath),
-            type: 'local_fs',
+            type: "local_fs",
           });
           break;
         }
-        case 'entriesByFolder': {
+        case "entriesByFolder": {
           const payload = body.params as EntriesByFolderParams;
           const { folder, extension, depth } = payload;
-          const entries = await listRepoFiles(repoPath, folder, extension, depth).then(files =>
+          const entries = await listRepoFiles(repoPath, folder, extension, depth).then((files) =>
             entriesFromFiles(
               repoPath,
-              files.map(file => ({ path: file })),
-            ),
+              files.map((file) => ({ path: file }))
+            )
           );
           res.json(entries);
           break;
         }
-        case 'entriesByFiles': {
+        case "entriesByFiles": {
           const payload = body.params as EntriesByFilesParams;
           const entries = await entriesFromFiles(repoPath, payload.files);
           res.json(entries);
           break;
         }
-        case 'getEntry': {
+        case "getEntry": {
           const payload = body.params as GetEntryParams;
           const [entry] = await entriesFromFiles(repoPath, [{ path: payload.path }]);
           res.json(entry);
           break;
         }
-        case 'persistEntry': {
-          const {
-            entry,
-            dataFiles = [entry as DataFile],
-            assets,
-          } = body.params as PersistEntryParams;
-          await Promise.all(
-            dataFiles.map(dataFile => writeFile(path.join(repoPath, dataFile.path), dataFile.raw)),
-          );
+        case "persistEntry": {
+          const { entry, dataFiles = [entry as DataFile], assets } = body.params as PersistEntryParams;
+          await Promise.all(dataFiles.map((dataFile) => writeFile(path.join(repoPath, dataFile.path), dataFile.raw)));
           // save assets
           await Promise.all(
-            assets.map(a =>
-              writeFile(path.join(repoPath, a.path), Buffer.from(a.content, a.encoding)),
-            ),
+            assets.map((a) => writeFile(path.join(repoPath, a.path), Buffer.from(a.content, a.encoding)))
           );
-          if (dataFiles.every(dataFile => dataFile.newPath)) {
-            dataFiles.forEach(async dataFile => {
-              await move(
-                path.join(repoPath, dataFile.path),
-                path.join(repoPath, dataFile.newPath!),
-              );
+          if (dataFiles.every((dataFile) => dataFile.newPath)) {
+            dataFiles.forEach(async (dataFile) => {
+              await move(path.join(repoPath, dataFile.path), path.join(repoPath, dataFile.newPath!));
             });
           }
-          res.json({ message: 'entry persisted' });
+          res.json({ message: "entry persisted" });
           break;
         }
-        case 'getMedia': {
+        case "getMedia": {
           const { mediaFolder } = body.params as GetMediaParams;
-          const files = await listRepoFiles(repoPath, mediaFolder, '', 1);
-          res.json(files);
+          const files = await listRepoFiles(repoPath, mediaFolder, "", 1);
+          res.json(
+            files.map((file) => ({
+              path: file,
+              url: path.join(repoPath, file)
+            }))
+          );
           break;
         }
-        case 'getMediaFile': {
+        case "getMediaFile": {
           const { path } = body.params as GetMediaFileParams;
           const mediaFile = await readMediaFile(repoPath, path);
           res.json(mediaFile);
           break;
         }
-        case 'persistMedia': {
+        case "persistMedia": {
           const { asset } = body.params as PersistMediaParams;
-          await writeFile(
-            path.join(repoPath, asset.path),
-            Buffer.from(asset.content, asset.encoding),
-          );
+          await writeFile(path.join(repoPath, asset.path), Buffer.from(asset.content, asset.encoding));
           const file = await readMediaFile(repoPath, asset.path);
           res.json(file);
           break;
         }
-        case 'deleteFile': {
+        case "deleteFile": {
           const { path: filePath } = body.params as DeleteFileParams;
           await deleteFile(repoPath, filePath);
           res.json({ message: `deleted file ${filePath}` });
           break;
         }
-        case 'deleteFiles': {
+        case "deleteFiles": {
           const { paths } = body.params as DeleteFilesParams;
-          await Promise.all(paths.map(filePath => deleteFile(repoPath, filePath)));
-          res.json({ message: `deleted files ${paths.join(', ')}` });
+          await Promise.all(paths.map((filePath) => deleteFile(repoPath, filePath)));
+          res.json({ message: `deleted files ${paths.join(", ")}` });
           break;
         }
-        case 'getDeployPreview': {
+        case "getDeployPreview": {
           res.json(null);
           break;
         }
@@ -134,7 +125,7 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
       }
     } catch (e: any) {
       logger.error(`Error handling ${JSON.stringify(req.body)}: ${e.message}`);
-      res.status(500).json({ error: 'Unknown error' });
+      res.status(500).json({ error: "Unknown error" });
     }
   };
 }
@@ -151,7 +142,7 @@ type Options = {
 export async function registerMiddleware(app: express.Express, options: Options) {
   const { logger } = options;
   const repoPath = path.resolve(process.env.GIT_REPO_DIRECTORY || process.cwd());
-  app.post('/api/v1', joi(getSchema({ repoPath })));
-  app.post('/api/v1', localFsMiddleware({ repoPath, logger }));
+  app.post("/api/v1", joi(getSchema({ repoPath })));
+  app.post("/api/v1", localFsMiddleware({ repoPath, logger }));
   logger.info(`Static CMS File System Proxy Server configured with ${repoPath}`);
 }

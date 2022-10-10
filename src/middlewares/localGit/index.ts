@@ -163,7 +163,11 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
         case "getMedia": {
           const { mediaFolder } = body.params as GetMediaParams;
           const mediaFiles = await runOnBranch(git, branch, async () => {
-            return listRepoFiles(repoPath, mediaFolder, "", 1);
+            const files = await listRepoFiles(repoPath, mediaFolder, "", 1);
+            return files.map((file) => ({
+              path: file,
+              url: path.join(repoPath, file),
+            }));
           });
           res.json(mediaFiles);
           break;

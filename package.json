@@ -1,7 +1,7 @@
 {
   "name": "@staticcms/proxy-server",
   "description": "Proxy server to be used with Static CMS proxy backend",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "repository": "https://github.com/staticjscms/static-cms-proxy-server",
   "bugs": "https://github.com/staticjscms/static-cms-proxy-server/issues",
   "license": "MIT",
