@@ -82,7 +82,6 @@ export function defaultSchema({ path = requiredString } = {}) {
             options: Joi.object({
               collectionName: Joi.string(),
               commitMessage: requiredString,
-              status: requiredString,
             }).required(),
           })
           .xor('entry', 'dataFiles')

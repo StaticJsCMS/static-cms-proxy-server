@@ -32,7 +32,6 @@ export type PersistEntryParams = {
   options: {
     collectionName?: string;
     commitMessage: string;
-    status: string;
   };
 };
 

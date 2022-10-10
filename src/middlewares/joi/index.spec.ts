@@ -146,7 +146,6 @@ describe('defaultSchema', () => {
             assets: [],
             options: {
               commitMessage: 'commitMessage',
-              status: 'draft',
             },
           },
         }),
@@ -194,7 +193,6 @@ describe('defaultSchema', () => {
           assets: [{ path: 'path', content: 'content', encoding: 'base64' }],
           options: {
             commitMessage: 'commitMessage',
-            status: 'draft',
           },
         },
       });
@@ -212,7 +210,6 @@ describe('defaultSchema', () => {
           assets: [{ path: 'path', content: 'content', encoding: 'base64' }],
           options: {
             commitMessage: 'commitMessage',
-            status: 'draft',
           },
         },
       });
