@@ -1,7 +1,7 @@
 {
   "name": "@staticcms/proxy-server",
   "description": "Proxy server to be used with Static CMS proxy backend",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "repository": "https://github.com/staticjscms/static-cms-proxy-server",
   "bugs": "https://github.com/staticjscms/static-cms-proxy-server/issues",
   "license": "MIT",
@@ -56,9 +56,7 @@
   "engines": {
     "node": ">=v14"
   },
-  "bin": {
-    "staticcms-proxy-server": "./dist/index.js"
-  },
+  "bin": "./dist/index.js",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
