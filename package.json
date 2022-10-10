@@ -1,0 +1,58 @@
+{
+  "name": "@staticcms/proxy-server",
+  "description": "Proxy server to be used with Static CMS proxy backend",
+  "version": "1.3.24",
+  "repository": "https://github.com/staticjscms/static-cms-proxy-server",
+  "bugs": "https://github.com/staticjscms/static-cms-proxy-server/issues",
+  "license": "MIT",
+  "main": "dist/index",
+  "keywords": [
+    "@staticcms",
+    "staticcms",
+    "static-cms",
+    "backend"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "webpack",
+    "prestart": "yarn build",
+    "start": "node dist/index.js",
+    "develop:run": "ts-node --files src/index.ts",
+    "develop": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec yarn develop:run",
+    "test": "jest",
+    "test:watch": "yarn test --watch",
+    "test:coverage": "yarn test --coverage"
+  },
+  "dependencies": {
+    "@hapi/joi": "17.1.1",
+    "async-mutex": "0.3.2",
+    "cors": "2.8.5",
+    "dotenv": "10.0.0",
+    "express": "4.18.2",
+    "morgan": "1.10.0",
+    "simple-git": "3.14.1",
+    "winston": "3.8.2"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.12",
+    "@types/express": "4.17.14",
+    "@types/hapi__joi": "17.1.8",
+    "@types/jest": "27.5.2",
+    "@types/morgan": "1.9.3",
+    "@types/node": "16.11.64",
+    "@types/vfile-message": "2.0.0",
+    "jest": "27.5.1",
+    "nodemon": "2.0.20",
+    "ts-jest": "27.1.5",
+    "ts-loader": "8.4.0",
+    "ts-node": "10.9.1",
+    "tsconfig-paths-webpack-plugin": "3.5.2",
+    "typescript": "4.8.4",
+    "webpack": "4.46.0",
+    "webpack-cli": "4.10.0",
+    "webpack-node-externals": "3.0.0"
+  },
+  "engines": {
+    "node": ">=v14"
+  }
+}
