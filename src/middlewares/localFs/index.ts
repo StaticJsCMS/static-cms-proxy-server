@@ -91,8 +91,7 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
         case 'getMedia': {
           const { mediaFolder } = body.params as GetMediaParams;
           const files = await listRepoFiles(repoPath, mediaFolder, '', 1);
-          const mediaFiles = await Promise.all(files.map(file => readMediaFile(repoPath, file)));
-          res.json(mediaFiles);
+          res.json(files);
           break;
         }
         case 'getMediaFile': {
