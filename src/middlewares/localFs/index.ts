@@ -82,8 +82,8 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
           const files = await listRepoFiles(repoPath, mediaFolder, "", 1);
           res.json(
             files.map((file) => ({
-              path: file,
-              url: path.join(repoPath, file)
+              path: file.replace('\\', '/'),
+              url: path.join(repoPath, file).replace('\\', '/')
             }))
           );
           break;
