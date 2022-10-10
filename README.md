@@ -15,7 +15,7 @@ backend:
   branch: master # optional, defaults to master
 ```
 
-4. Start you local development server (e.g. run `gatsby develop`).
+4. Start you local development server.
 
 ## Custom Configuration
 

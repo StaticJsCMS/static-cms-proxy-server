@@ -57,6 +57,8 @@
     "node": ">=v14"
   },
   "bin": "./dist/index.js",
+    "staticcms-proxy-server": "./dist/index.js"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
