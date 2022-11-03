@@ -1,7 +1,7 @@
 {
-  "name": "@staticcms/proxy-server",
+  "name": "static-cms-proxy-server",
   "description": "Proxy server to be used with Static CMS proxy backend",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "repository": "https://github.com/staticjscms/static-cms-proxy-server",
   "bugs": "https://github.com/staticjscms/static-cms-proxy-server/issues",
   "license": "MIT",
@@ -10,11 +10,12 @@
     "@staticcms",
     "staticcms",
     "static-cms",
-    "backend"
+    "backend",
+    "proxy"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "webpack",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack",
     "develop:run": "ts-node --files src/index.ts",
     "develop": "nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec yarn develop:run",
     "prepublishOnly": "yarn build",
@@ -42,6 +43,7 @@
     "@types/morgan": "1.9.3",
     "@types/node": "16.11.64",
     "@types/vfile-message": "2.0.0",
+    "cross-env": "7.0.3",
     "jest": "27.5.1",
     "nodemon": "2.0.20",
     "ts-jest": "27.1.5",
@@ -56,9 +58,7 @@
   "engines": {
     "node": ">=v14"
   },
-  "bin": {
-    "staticcms-proxy-server": "dist/index"
-  },
+  "bin": "dist/index.js",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
