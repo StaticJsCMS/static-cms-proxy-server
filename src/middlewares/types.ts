@@ -37,6 +37,7 @@ export type PersistEntryParams = {
 
 export type GetMediaParams = {
   mediaFolder: string;
+  publicFolder: string;
 };
 
 export type GetMediaFileParams = {

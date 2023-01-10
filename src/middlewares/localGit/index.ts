@@ -1,15 +1,15 @@
-import { Mutex, withTimeout } from "async-mutex";
-import path from "path";
-import simpleGit from "simple-git";
+import { Mutex, withTimeout } from 'async-mutex';
+import path from 'path';
+import simpleGit from 'simple-git';
 
-import { defaultSchema, joi } from "../joi";
-import { pathTraversal } from "../joi/customValidators";
-import { entriesFromFiles, readMediaFile } from "../utils/entries";
-import { deleteFile, listRepoFiles, move, writeFile } from "../utils/fs";
+import { defaultSchema, joi } from '../joi';
+import { pathTraversal } from '../joi/customValidators';
+import { entriesFromFiles, readMediaFile } from '../utils/entries';
+import { deleteFile, listRepoFiles, move, writeFile } from '../utils/fs';
 
-import type express from "express";
-import type { SimpleGit } from "simple-git";
-import type winston from "winston";
+import type express from 'express';
+import type { SimpleGit } from 'simple-git';
+import type winston from 'winston';
 import type {
   Asset,
   DataFile,
@@ -23,20 +23,20 @@ import type {
   GetMediaParams,
   PersistEntryParams,
   PersistMediaParams,
-} from "../types";
+} from '../types';
 
 async function commit(git: SimpleGit, commitMessage: string) {
-  await git.add(".");
+  await git.add('.');
   await git.commit(commitMessage, undefined, {
     // setting the value to a string passes name=value
     // any other value passes just the key
-    "--no-verify": null,
-    "--no-gpg-sign": null,
+    '--no-verify': null,
+    '--no-gpg-sign': null,
   });
 }
 
 async function getCurrentBranch(git: SimpleGit) {
-  const currentBranch = await git.branchLocal().then((summary) => summary.current);
+  const currentBranch = await git.branchLocal().then(summary => summary.current);
   return currentBranch;
 }
 
@@ -63,14 +63,18 @@ async function commitEntry(
   repoPath: string,
   dataFiles: DataFile[],
   assets: Asset[],
-  commitMessage: string
+  commitMessage: string,
 ) {
   // save entry content
-  await Promise.all(dataFiles.map((dataFile) => writeFile(path.join(repoPath, dataFile.path), dataFile.raw)));
+  await Promise.all(
+    dataFiles.map(dataFile => writeFile(path.join(repoPath, dataFile.path), dataFile.raw)),
+  );
   // save assets
-  await Promise.all(assets.map((a) => writeFile(path.join(repoPath, a.path), Buffer.from(a.content, a.encoding))));
-  if (dataFiles.every((dataFile) => dataFile.newPath)) {
-    dataFiles.forEach(async (dataFile) => {
+  await Promise.all(
+    assets.map(a => writeFile(path.join(repoPath, a.path), Buffer.from(a.content, a.encoding))),
+  );
+  if (dataFiles.every(dataFile => dataFile.newPath)) {
+    dataFiles.forEach(async dataFile => {
       await move(path.join(repoPath, dataFile.path), path.join(repoPath, dataFile.newPath!));
     });
   }
@@ -101,17 +105,17 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
   const git = simpleGit(repoPath);
 
   // we can only perform a single git operation at any given time
-  const mutex = withTimeout(new Mutex(), 3000, new Error("Request timed out"));
+  const mutex = withTimeout(new Mutex(), 3000, new Error('Request timed out'));
 
   return async function (req: express.Request, res: express.Response) {
     let release;
     try {
       release = await mutex.acquire();
       const { body } = req;
-      if (body.action === "info") {
+      if (body.action === 'info') {
         res.json({
           repo: path.basename(repoPath),
-          type: "local_git",
+          type: 'local_git',
         });
         return;
       }
@@ -125,54 +129,63 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
       }
 
       switch (body.action) {
-        case "entriesByFolder": {
+        case 'entriesByFolder': {
           const payload = body.params as EntriesByFolderParams;
           const { folder, extension, depth } = payload;
           const entries = await runOnBranch(git, branch, () =>
-            listRepoFiles(repoPath, folder, extension, depth).then((files) =>
+            listRepoFiles(repoPath, folder, extension, depth).then(files =>
               entriesFromFiles(
                 repoPath,
-                files.map((file) => ({ path: file }))
-              )
-            )
+                files.map(file => ({ path: file })),
+              ),
+            ),
           );
           res.json(entries);
           break;
         }
-        case "entriesByFiles": {
+        case 'entriesByFiles': {
           const payload = body.params as EntriesByFilesParams;
-          const entries = await runOnBranch(git, branch, () => entriesFromFiles(repoPath, payload.files));
+          const entries = await runOnBranch(git, branch, () =>
+            entriesFromFiles(repoPath, payload.files),
+          );
           res.json(entries);
           break;
         }
-        case "getEntry": {
+        case 'getEntry': {
           const payload = body.params as GetEntryParams;
-          const [entry] = await runOnBranch(git, branch, () => entriesFromFiles(repoPath, [{ path: payload.path }]));
+          const [entry] = await runOnBranch(git, branch, () =>
+            entriesFromFiles(repoPath, [{ path: payload.path }]),
+          );
           res.json(entry);
           break;
         }
-        case "persistEntry": {
-          const { entry, dataFiles = [entry as DataFile], assets, options } = body.params as PersistEntryParams;
+        case 'persistEntry': {
+          const {
+            entry,
+            dataFiles = [entry as DataFile],
+            assets,
+            options,
+          } = body.params as PersistEntryParams;
 
           await runOnBranch(git, branch, async () => {
             await commitEntry(git, repoPath, dataFiles, assets, options.commitMessage);
           });
-          res.json({ message: "entry persisted" });
+          res.json({ message: 'entry persisted' });
           break;
         }
-        case "getMedia": {
+        case 'getMedia': {
           const { mediaFolder } = body.params as GetMediaParams;
           const mediaFiles = await runOnBranch(git, branch, async () => {
-            const files = await listRepoFiles(repoPath, mediaFolder, "", 1);
-            return files.map((file) => ({
-              path: file.replace(/\\/g, "/"),
-              url: path.join(repoPath, file).replace(/\\/g, "/"),
+            const files = await listRepoFiles(repoPath, mediaFolder, '', 1);
+            return files.map(file => ({
+              path: file.replace(/\\/g, '/'),
+              url: path.join(repoPath, file).replace(/\\/g, '/'),
             }));
           });
           res.json(mediaFiles);
           break;
         }
-        case "getMediaFile": {
+        case 'getMediaFile': {
           const { path } = body.params as GetMediaFileParams;
           const mediaFile = await runOnBranch(git, branch, () => {
             return readMediaFile(repoPath, path);
@@ -180,21 +193,24 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
           res.json(mediaFile);
           break;
         }
-        case "persistMedia": {
+        case 'persistMedia': {
           const {
             asset,
             options: { commitMessage },
           } = body.params as PersistMediaParams;
 
           const file = await runOnBranch(git, branch, async () => {
-            await writeFile(path.join(repoPath, asset.path), Buffer.from(asset.content, asset.encoding));
+            await writeFile(
+              path.join(repoPath, asset.path),
+              Buffer.from(asset.content, asset.encoding),
+            );
             await commit(git, commitMessage);
             return readMediaFile(repoPath, asset.path);
           });
           res.json(file);
           break;
         }
-        case "deleteFile": {
+        case 'deleteFile': {
           const {
             path: filePath,
             options: { commitMessage },
@@ -206,19 +222,19 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
           res.json({ message: `deleted file ${filePath}` });
           break;
         }
-        case "deleteFiles": {
+        case 'deleteFiles': {
           const {
             paths,
             options: { commitMessage },
           } = body.params as DeleteFilesParams;
           await runOnBranch(git, branch, async () => {
-            await Promise.all(paths.map((filePath) => deleteFile(repoPath, filePath)));
+            await Promise.all(paths.map(filePath => deleteFile(repoPath, filePath)));
             await commit(git, commitMessage);
           });
-          res.json({ message: `deleted files ${paths.join(", ")}` });
+          res.json({ message: `deleted files ${paths.join(', ')}` });
           break;
         }
-        case "getDeployPreview": {
+        case 'getDeployPreview': {
           res.json(null);
           break;
         }
@@ -230,7 +246,7 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
       }
     } catch (e: any) {
       logger.error(`Error handling ${JSON.stringify(req.body)}: ${e.message}`);
-      res.status(500).json({ error: "Unknown error" });
+      res.status(500).json({ error: 'Unknown error' });
     } finally {
       release && release();
     }
@@ -245,7 +261,7 @@ export async function registerMiddleware(app: express.Express, options: Options)
   const { logger } = options;
   const repoPath = path.resolve(process.env.GIT_REPO_DIRECTORY || process.cwd());
   await validateRepo({ repoPath });
-  app.post("/api/v1", joi(getSchema({ repoPath })));
-  app.post("/api/v1", localGitMiddleware({ repoPath, logger }));
+  app.post('/api/v1', joi(getSchema({ repoPath })));
+  app.post('/api/v1', localGitMiddleware({ repoPath, logger }));
   logger.info(`Static CMS Git Proxy Server configured with ${repoPath}`);
 }

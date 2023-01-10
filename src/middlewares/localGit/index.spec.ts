@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import winston from 'winston';
+import { join } from 'path';
 
 import { validateRepo, getSchema, localGitMiddleware } from '.';
 
-import type Joi from '@hapi/joi';
+import type Joi from 'joi';
 import type express from 'express';
-import { join } from 'path';
-
 jest.mock('simple-git');
 
 function assetFailure(result: Joi.ValidationResult, expectedMessage: string) {
@@ -54,7 +52,7 @@ describe('localGitMiddleware', () => {
 
   describe('getSchema', () => {
     it('should throw on path traversal', () => {
-      const schema = getSchema({ repoPath: join("Users", "user", "documents", "code", "repo") });
+      const schema = getSchema({ repoPath: join('Users', 'user', 'documents', 'code', 'repo') });
 
       assetFailure(
         schema.validate({
@@ -66,7 +64,7 @@ describe('localGitMiddleware', () => {
     });
 
     it('should not throw on valid path', () => {
-      const schema = getSchema({ repoPath: join("Users", "user", "documents", "code", "repo") });
+      const schema = getSchema({ repoPath: join('Users', 'user', 'documents', 'code', 'repo') });
 
       const { error } = schema.validate({
         action: 'getEntry',
@@ -77,7 +75,7 @@ describe('localGitMiddleware', () => {
     });
 
     it('should throw on folder traversal', () => {
-      const schema = getSchema({ repoPath: join("Users", "user", "documents", "code", "repo") });
+      const schema = getSchema({ repoPath: join('Users', 'user', 'documents', 'code', 'repo') });
 
       assetFailure(
         schema.validate({
@@ -89,7 +87,7 @@ describe('localGitMiddleware', () => {
     });
 
     it('should not throw on valid folder', () => {
-      const schema = getSchema({ repoPath: join("Users", "user", "documents", "code", "repo") });
+      const schema = getSchema({ repoPath: join('Users', 'user', 'documents', 'code', 'repo') });
 
       const { error } = schema.validate({
         action: 'entriesByFolder',
@@ -100,7 +98,7 @@ describe('localGitMiddleware', () => {
     });
 
     it('should throw on media folder traversal', () => {
-      const schema = getSchema({ repoPath: join("Users", "user", "documents", "code", "repo") });
+      const schema = getSchema({ repoPath: join('Users', 'user', 'documents', 'code', 'repo') });
 
       assetFailure(
         schema.validate({
@@ -112,7 +110,7 @@ describe('localGitMiddleware', () => {
     });
 
     it('should not throw on valid folder', () => {
-      const schema = getSchema({ repoPath: join("Users", "user", "documents", "code", "repo") });
+      const schema = getSchema({ repoPath: join('Users', 'user', 'documents', 'code', 'repo') });
       const { error } = schema.validate({
         action: 'getMedia',
         params: { ...defaultParams, mediaFolder: 'static/images' },
