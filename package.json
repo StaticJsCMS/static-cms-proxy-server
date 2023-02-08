@@ -41,7 +41,7 @@
     "@types/node": "16.18.12",
     "jest": "29.4.2",
     "nodemon": "2.0.20",
-    "prettier": "2.8.3",
+    "prettier": "2.8.4",
     "ts-jest": "29.0.5",
     "ts-loader": "9.4.2",
     "ts-node": "10.9.1",
