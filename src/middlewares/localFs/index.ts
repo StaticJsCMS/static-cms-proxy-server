@@ -137,8 +137,16 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
           break;
         }
       }
-    } catch (e: any) {
-      logger.error(`Error handling ${JSON.stringify(req.body)}: ${e.message}`);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        logger.error(`Error handling ${JSON.stringify(req.body)}: ${e.message}`);
+
+        if (e.message.startsWith('ENOENT: no such file or directory')) {
+          res.status(404).json({ error: 'Not found' });
+          return;
+        }
+      }
+
       res.status(500).json({ error: 'Unknown error' });
     }
   };
