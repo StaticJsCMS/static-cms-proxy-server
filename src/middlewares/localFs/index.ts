@@ -44,7 +44,7 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
           const entries = await listRepoFiles(repoPath, folder, extension, depth).then(files =>
             entriesFromFiles(
               repoPath,
-              files.map(file => ({ path: file })),
+              files.map(file => ({ path: file.file })),
             ),
           );
           res.json(entries);
@@ -93,8 +93,9 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
           const files = await listRepoFiles(repoPath, mediaFolder, '', 1);
           res.json(
             files.map(file => ({
-              path: file.replace(/\\/g, '/'),
-              url: file.replace(/\\/g, '/').replace(mediaFolder.replace(/^\//g, ''), publicFolder),
+            path: file.file.replace(/\\/g, '/'),
+            url: file.file.replace(/\\/g, '/').replace(mediaFolder.replace(/^\//g, ''), publicFolder),
+            isDirectory: file.isDirectory,
             })),
           );
           break;
