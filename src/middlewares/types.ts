@@ -64,3 +64,8 @@ export type DeleteFilesParams = {
     commitMessage: string;
   };
 };
+
+export type FsItem = {
+  file: string;
+  isDirectory: boolean;
+};
