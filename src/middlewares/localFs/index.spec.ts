@@ -99,9 +99,18 @@ describe('localFsMiddleware', () => {
   describe('getMedia', () => {
     it('should get media files', async () => {
       (listRepoFiles as jest.Mock).mockResolvedValue([
-        'mediaFolder/asset1.jpg',
-        'mediaFolder/asset2.jpg',
-        'mediaFolder/asset3.jpg',
+        { 
+          file: 'mediaFolder/asset1.jpg',
+          isDirectory: false
+        },
+        { 
+          file: 'mediaFolder/asset2.jpg',
+          isDirectory: false
+        },
+        { 
+          file: 'mediaFolder/asset3.jpg',
+          isDirectory: false
+        }
       ]);
 
       const json = jest.fn();
@@ -126,23 +135,35 @@ describe('localFsMiddleware', () => {
         {
           path: 'mediaFolder/asset1.jpg',
           url: 'mediaFolder/asset1.jpg',
+          isDirectory: false,
         },
         {
           path: 'mediaFolder/asset2.jpg',
           url: 'mediaFolder/asset2.jpg',
+          isDirectory: false,
         },
         {
           path: 'mediaFolder/asset3.jpg',
           url: 'mediaFolder/asset3.jpg',
+          isDirectory: false,
         },
       ]);
     });
 
     it('should translate media path to public path even when media path is absolute', async () => {
       (listRepoFiles as jest.Mock).mockResolvedValue([
-        'mediaFolder/asset1.jpg',
-        'mediaFolder/asset2.jpg',
-        'mediaFolder/asset3.jpg',
+        { 
+          file: 'mediaFolder/asset1.jpg',
+          isDirectory: false
+        },
+        { 
+          file: 'mediaFolder/asset2.jpg',
+          isDirectory: false
+        },
+        { 
+          file: 'mediaFolder/asset3.jpg',
+          isDirectory: false
+        }
       ]);
 
       const json = jest.fn();
@@ -168,23 +189,35 @@ describe('localFsMiddleware', () => {
         {
           path: 'mediaFolder/asset1.jpg',
           url: '/publicFolder/asset1.jpg',
+          isDirectory: false,
         },
         {
           path: 'mediaFolder/asset2.jpg',
           url: '/publicFolder/asset2.jpg',
+          isDirectory: false,
         },
         {
           path: 'mediaFolder/asset3.jpg',
           url: '/publicFolder/asset3.jpg',
+          isDirectory: false,
         },
       ]);
     });
 
     it('should translate media path to public path', async () => {
       (listRepoFiles as jest.Mock).mockResolvedValue([
-        'mediaFolder/asset1.jpg',
-        'mediaFolder/asset2.jpg',
-        'mediaFolder/asset3.jpg',
+        { 
+          file: 'mediaFolder/asset1.jpg',
+          isDirectory: false
+        },
+        { 
+          file: 'mediaFolder/asset2.jpg',
+          isDirectory: false
+        },
+        { 
+          file: 'mediaFolder/asset3.jpg',
+          isDirectory: false
+        }
       ]);
 
       const json = jest.fn();
@@ -210,14 +243,17 @@ describe('localFsMiddleware', () => {
         {
           path: 'mediaFolder/asset1.jpg',
           url: '/publicFolder/asset1.jpg',
+          isDirectory: false,
         },
         {
           path: 'mediaFolder/asset2.jpg',
           url: '/publicFolder/asset2.jpg',
+          isDirectory: false,
         },
         {
           path: 'mediaFolder/asset3.jpg',
           url: '/publicFolder/asset3.jpg',
+          isDirectory: false,
         },
       ]);
     });
