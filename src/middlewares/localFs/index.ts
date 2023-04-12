@@ -41,10 +41,10 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
         case 'entriesByFolder': {
           const payload = body.params as EntriesByFolderParams;
           const { folder, extension, depth } = payload;
-          const entries = await listRepoFiles(repoPath, folder, extension, depth).then(files =>
+          const entries = await listRepoFiles(repoPath, folder, extension, depth).then(items =>
             entriesFromFiles(
               repoPath,
-              files.map(file => ({ path: file.file })),
+              items.map(item => ({ path: item.file })),
             ),
           );
           res.json(entries);
@@ -90,12 +90,12 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
         }
         case 'getMedia': {
           const { mediaFolder, publicFolder = mediaFolder } = body.params as GetMediaParams;
-          const files = await listRepoFiles(repoPath, mediaFolder, '', 1);
+          const fsItems = await listRepoFiles(repoPath, mediaFolder, '', 1);
           res.json(
-            files.map(file => ({
-            path: file.file.replace(/\\/g, '/'),
-            url: file.file.replace(/\\/g, '/').replace(mediaFolder.replace(/^\//g, ''), publicFolder),
-            isDirectory: file.isDirectory,
+            fsItems.map(item => ({
+              path: item.file.replace(/\\/g, '/'),
+              url: item.file.replace(/\\/g, '/').replace(mediaFolder.replace(/^\//g, ''), publicFolder),
+              isDirectory: item.isDirectory,
             })),
           );
           break;

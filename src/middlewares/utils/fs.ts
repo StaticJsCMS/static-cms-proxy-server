@@ -54,7 +54,7 @@ export async function move(from: string, to: string) {
   const sourceDir = path.dirname(from);
   const destDir = path.dirname(to);
   const allFiles = await listFiles(sourceDir, '', 100);
-  await Promise.all(allFiles.map(file => moveFile(file.file, file.file.replace(sourceDir, destDir))));
+  await Promise.all(allFiles.map(item => moveFile(item.file, item.file.replace(sourceDir, destDir))));
 }
 
 export async function getUpdateDate(repoPath: string, filePath: string) {
