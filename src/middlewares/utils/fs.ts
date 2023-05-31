@@ -13,7 +13,10 @@ async function listFiles(dir: string, extension: string, depth: number): Promise
     const files = await Promise.all(
       dirents.map(dirent => {
         const res = path.join(dir, dirent.name);
-        return {file: [res].filter(f => f.endsWith(extension))[0], isDirectory: dirent.isDirectory()} as FsItem;
+        return {
+          file: [res].filter(f => f.endsWith(extension))[0],
+          isDirectory: dirent.isDirectory(),
+        } as FsItem;
       }),
     );
     return ([] as FsItem[]).concat(...files);
@@ -27,9 +30,13 @@ export async function listRepoFiles(
   folder: string,
   extension: string,
   depth: number,
-) {
+): Promise<FsItem[]> {
   const files = await listFiles(path.join(repoPath, folder), extension, depth);
-  return files.map(f => {return {file: f.file.slice(repoPath.length + 1), isDirectory: f.isDirectory} as FsItem});
+  return files
+    .filter(f => f.file)
+    .map(f => {
+      return { file: f.file.slice(repoPath.length + 1), isDirectory: f.isDirectory } as FsItem;
+    });
 }
 
 export async function writeFile(filePath: string, content: Buffer | string) {
@@ -54,7 +61,9 @@ export async function move(from: string, to: string) {
   const sourceDir = path.dirname(from);
   const destDir = path.dirname(to);
   const allFiles = await listFiles(sourceDir, '', 100);
-  await Promise.all(allFiles.map(item => moveFile(item.file, item.file.replace(sourceDir, destDir))));
+  await Promise.all(
+    allFiles.map(item => moveFile(item.file, item.file.replace(sourceDir, destDir))),
+  );
 }
 
 export async function getUpdateDate(repoPath: string, filePath: string) {
