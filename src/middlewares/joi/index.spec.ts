@@ -273,7 +273,7 @@ describe('defaultSchema', () => {
           action: 'persistMedia',
           params: { ...defaultParams, asset: { path: 'path' } },
         }),
-        '"params.asset.content" is required',
+        '"params.asset.encoding" is required',
       );
     });
 
