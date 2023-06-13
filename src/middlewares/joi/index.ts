@@ -29,7 +29,7 @@ export function defaultSchema({ path = requiredString } = {}) {
 
   const asset = Joi.object({
     path,
-    content: requiredString,
+    content: Joi.string().allow(''),
     encoding: requiredString.valid('base64'),
   });
 

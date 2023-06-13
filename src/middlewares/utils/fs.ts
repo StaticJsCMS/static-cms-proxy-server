@@ -13,9 +13,15 @@ async function listFiles(dir: string, extension: string, depth: number): Promise
     const files = await Promise.all(
       dirents.map(dirent => {
         const res = path.join(dir, dirent.name);
+        const isDirectory = dirent.isDirectory();
+
+        if (depth > 1 && isDirectory) {
+          return listFiles(res, extension, depth - 1);
+        }
+
         return {
-          file: [res].filter(f => f.endsWith(extension))[0],
-          isDirectory: dirent.isDirectory(),
+          file: extension === '' ? res : [res].filter(f => f.endsWith(extension))[0],
+          isDirectory,
         } as FsItem;
       }),
     );
