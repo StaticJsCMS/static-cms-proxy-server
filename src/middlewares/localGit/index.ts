@@ -463,5 +463,5 @@ export async function registerMiddleware(app: express.Express, options: Options)
   await validateRepo({ repoPath });
   app.post('/api/v1', joi(getSchema({ repoPath })));
   app.post('/api/v1', localGitMiddleware({ repoPath, logger }));
-  logger.info(`Decap CMS Git Proxy Server configured with ${repoPath}`);
+  logger.info(`Static CMS Git Proxy Server configured with ${repoPath}`);
 }
