@@ -7,7 +7,14 @@ const allowedActions = [
   'entriesByFolder',
   'entriesByFiles',
   'getEntry',
+  'unpublishedEntries',
+  'unpublishedEntry',
+  'unpublishedEntryDataFile',
+  'unpublishedEntryMediaFile',
+  'deleteUnpublishedEntry',
   'persistEntry',
+  'updateUnpublishedEntryStatus',
+  'publishUnpublishedEntry',
   'getMedia',
   'getMediaFile',
   'persistMedia',
@@ -18,6 +25,7 @@ const allowedActions = [
 
 const requiredString = Joi.string().required();
 const requiredNumber = Joi.number().required();
+const requiredBool = Joi.bool().required();
 
 const collection = requiredString;
 const slug = requiredString;
@@ -73,18 +81,87 @@ export function defaultSchema({ path = requiredString } = {}) {
           .required(),
       },
       {
+        is: 'unpublishedEntries',
+        then: defaultParams.keys({ branch: requiredString }).required(),
+      },
+      {
+        is: 'unpublishedEntry',
+        then: defaultParams
+          .keys({
+            id: Joi.string().optional(),
+            collection: Joi.string().optional(),
+            slug: Joi.string().optional(),
+            cmsLabelPrefix: Joi.string().optional(),
+          })
+          .required(),
+      },
+      {
+        is: 'unpublishedEntryDataFile',
+        then: defaultParams
+          .keys({
+            collection,
+            slug,
+            id: requiredString,
+            path: requiredString,
+          })
+          .required(),
+      },
+      {
+        is: 'unpublishedEntryMediaFile',
+        then: defaultParams
+          .keys({
+            collection,
+            slug,
+            id: requiredString,
+            path: requiredString,
+          })
+          .required(),
+      },
+      {
+        is: 'deleteUnpublishedEntry',
+        then: defaultParams
+          .keys({
+            collection,
+            slug,
+          })
+          .required(),
+      },
+      {
         is: 'persistEntry',
         then: defaultParams
           .keys({
+            cmsLabelPrefix: Joi.string().optional(),
             entry: dataFile, // entry is kept for backwards compatibility
             dataFiles: Joi.array().items(dataFile),
             assets: Joi.array().items(asset).required(),
             options: Joi.object({
               collectionName: Joi.string(),
               commitMessage: requiredString,
+              useWorkflow: requiredBool,
+              status: requiredString,
             }).required(),
           })
           .xor('entry', 'dataFiles')
+          .required(),
+      },
+      {
+        is: 'updateUnpublishedEntryStatus',
+        then: defaultParams
+          .keys({
+            collection,
+            slug,
+            newStatus: requiredString,
+            cmsLabelPrefix: Joi.string().optional(),
+          })
+          .required(),
+      },
+      {
+        is: 'publishUnpublishedEntry',
+        then: defaultParams
+          .keys({
+            collection,
+            slug,
+          })
           .required(),
       },
       {
