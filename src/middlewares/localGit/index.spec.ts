@@ -3,10 +3,10 @@ import winston from 'winston';
 
 import { validateRepo, getSchema, localGitMiddleware } from '.';
 
-import type Joi from '@hapi/joi';
+import type Joi from 'joi';
 import type express from 'express';
 
-jest.mock('decap-cms-lib-util', () => jest.fn());
+jest.mock('../utils/APIUtils', () => jest.fn());
 jest.mock('simple-git');
 
 function assetFailure(result: Joi.ValidationResult, expectedMessage: string) {
