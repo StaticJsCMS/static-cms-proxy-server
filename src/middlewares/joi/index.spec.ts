@@ -27,7 +27,7 @@ describe('defaultSchema', () => {
 
     assetFailure(
       schema.validate({ action: 'unknown', params: {} }),
-      '"action" must be one of [info, entriesByFolder, entriesByFiles, getEntry, persistEntry, getMedia, getMediaFile, persistMedia, deleteFile, deleteFiles, getDeployPreview]',
+      '"action" must be one of [info, entriesByFolder, entriesByFiles, getEntry, unpublishedEntries, unpublishedEntry, unpublishedEntryDataFile, unpublishedEntryMediaFile, deleteUnpublishedEntry, persistEntry, updateUnpublishedEntryStatus, publishUnpublishedEntry, getMedia, getMediaFile, persistMedia, deleteFile, deleteFiles, getDeployPreview]',
     );
   });
 
@@ -134,6 +134,142 @@ describe('defaultSchema', () => {
     });
   });
 
+  describe('unpublishedEntries', () => {
+    it('should fail on invalid params', () => {
+      const schema = defaultSchema();
+
+      assetFailure(
+        schema.validate({ action: 'unpublishedEntries', params: {} }),
+        '"params.branch" is required',
+      );
+    });
+
+    it('should pass on valid params', () => {
+      const schema = defaultSchema();
+      const { error } = schema.validate({
+        action: 'unpublishedEntries',
+        params: { ...defaultParams, branch: 'master' },
+      });
+
+      expect(error).toBeUndefined();
+    });
+  });
+
+  describe('unpublishedEntry', () => {
+    it('should fail on invalid params', () => {
+      const schema = defaultSchema();
+      assetFailure(
+        schema.validate({ action: 'unpublishedEntry', params: {} }),
+        '"params.branch" is required',
+      );
+    });
+
+    it('should pass on valid collection and slug', () => {
+      const schema = defaultSchema();
+      const { error } = schema.validate({
+        action: 'unpublishedEntry',
+        params: { ...defaultParams, collection: 'collection', slug: 'slug' },
+      });
+
+      expect(error).toBeUndefined();
+    });
+
+    it('should pass on valid id', () => {
+      const schema = defaultSchema();
+      const { error } = schema.validate({
+        action: 'unpublishedEntry',
+        params: { ...defaultParams, id: 'id' },
+      });
+
+      expect(error).toBeUndefined();
+    });
+  });
+
+  ['unpublishedEntryDataFile', 'unpublishedEntryMediaFile'].forEach(action => {
+    describe(action, () => {
+      it('should fail on invalid params', () => {
+        const schema = defaultSchema();
+
+        assetFailure(
+          schema.validate({ action, params: { ...defaultParams } }),
+          '"params.collection" is required',
+        );
+        assetFailure(
+          schema.validate({
+            action,
+            params: { ...defaultParams, collection: 'collection' },
+          }),
+          '"params.slug" is required',
+        );
+        assetFailure(
+          schema.validate({
+            action,
+            params: { ...defaultParams, collection: 'collection', slug: 'slug' },
+          }),
+          '"params.id" is required',
+        );
+        assetFailure(
+          schema.validate({
+            action,
+            params: { ...defaultParams, collection: 'collection', slug: 'slug', id: 'id' },
+          }),
+          '"params.path" is required',
+        );
+      });
+
+      it('should pass on valid params', () => {
+        const schema = defaultSchema();
+        const { error } = schema.validate({
+          action,
+          params: {
+            ...defaultParams,
+            collection: 'collection',
+            slug: 'slug',
+            id: 'id',
+            path: 'path',
+          },
+        });
+
+        expect(error).toBeUndefined();
+      });
+    });
+  });
+
+  describe('deleteUnpublishedEntry', () => {
+    it('should fail on invalid params', () => {
+      const schema = defaultSchema();
+
+      assetFailure(
+        schema.validate({ action: 'deleteUnpublishedEntry', params: { ...defaultParams } }),
+        '"params.collection" is required',
+      );
+      assetFailure(
+        schema.validate({
+          action: 'deleteUnpublishedEntry',
+          params: { ...defaultParams, collection: 'collection' },
+        }),
+        '"params.slug" is required',
+      );
+      assetFailure(
+        schema.validate({
+          action: 'deleteUnpublishedEntry',
+          params: { ...defaultParams, collection: 'collection', slug: 1 },
+        }),
+        '"params.slug" must be a string',
+      );
+    });
+
+    it('should pass on valid params', () => {
+      const schema = defaultSchema();
+      const { error } = schema.validate({
+        action: 'deleteUnpublishedEntry',
+        params: { ...defaultParams, collection: 'collection', slug: 'slug' },
+      });
+
+      expect(error).toBeUndefined();
+    });
+  });
+
   describe('persistEntry', () => {
     it('should fail on invalid params', () => {
       const schema = defaultSchema();
@@ -146,6 +282,8 @@ describe('defaultSchema', () => {
             assets: [],
             options: {
               commitMessage: 'commitMessage',
+              useWorkflow: true,
+              status: 'draft',
             },
           },
         }),
@@ -193,6 +331,8 @@ describe('defaultSchema', () => {
           assets: [{ path: 'path', content: 'content', encoding: 'base64' }],
           options: {
             commitMessage: 'commitMessage',
+            useWorkflow: true,
+            status: 'draft',
           },
         },
       });
@@ -210,8 +350,73 @@ describe('defaultSchema', () => {
           assets: [{ path: 'path', content: 'content', encoding: 'base64' }],
           options: {
             commitMessage: 'commitMessage',
+            useWorkflow: true,
+            status: 'draft',
           },
         },
+      });
+
+      expect(error).toBeUndefined();
+    });
+  });
+
+  describe('updateUnpublishedEntryStatus', () => {
+    it('should fail on invalid params', () => {
+      const schema = defaultSchema();
+
+      assetFailure(
+        schema.validate({ action: 'updateUnpublishedEntryStatus', params: { ...defaultParams } }),
+        '"params.collection" is required',
+      );
+      assetFailure(
+        schema.validate({
+          action: 'updateUnpublishedEntryStatus',
+          params: { ...defaultParams, collection: 'collection' },
+        }),
+        '"params.slug" is required',
+      );
+      assetFailure(
+        schema.validate({
+          action: 'updateUnpublishedEntryStatus',
+          params: { ...defaultParams, collection: 'collection', slug: 'slug' },
+        }),
+        '"params.newStatus" is required',
+      );
+    });
+
+    it('should pass on valid params', () => {
+      const schema = defaultSchema();
+      const { error } = schema.validate({
+        action: 'updateUnpublishedEntryStatus',
+        params: { ...defaultParams, collection: 'collection', slug: 'slug', newStatus: 'draft' },
+      });
+
+      expect(error).toBeUndefined();
+    });
+  });
+
+  describe('publishUnpublishedEntry', () => {
+    it('should fail on invalid params', () => {
+      const schema = defaultSchema();
+
+      assetFailure(
+        schema.validate({ action: 'publishUnpublishedEntry', params: { ...defaultParams } }),
+        '"params.collection" is required',
+      );
+      assetFailure(
+        schema.validate({
+          action: 'publishUnpublishedEntry',
+          params: { ...defaultParams, collection: 'collection' },
+        }),
+        '"params.slug" is required',
+      );
+    });
+
+    it('should pass on valid params', () => {
+      const schema = defaultSchema();
+      const { error } = schema.validate({
+        action: 'publishUnpublishedEntry',
+        params: { ...defaultParams, collection: 'collection', slug: 'slug' },
       });
 
       expect(error).toBeUndefined();
