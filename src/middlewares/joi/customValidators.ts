@@ -9,8 +9,9 @@ export function pathTraversal(repoPath: string) {
       'path.invalid': '{{#label}} must resolve to a path under the configured repository',
     },
     validate(value, helpers) {
+      const resolvedRepoPath = path.join(repoPath, '');
       const resolvedPath = path.join(repoPath, value);
-      if (!resolvedPath.startsWith(repoPath)) {
+      if (!resolvedPath.startsWith(resolvedRepoPath)) {
         return { value, errors: helpers.error('path.invalid') };
       }
     },
