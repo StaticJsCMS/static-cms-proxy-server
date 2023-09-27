@@ -25,7 +25,6 @@ const allowedActions = [
 
 const requiredString = Joi.string().required();
 const requiredNumber = Joi.number().required();
-const requiredBool = Joi.bool().required();
 
 const collection = requiredString;
 const slug = requiredString;
@@ -137,8 +136,8 @@ export function defaultSchema({ path = requiredString } = {}) {
             options: Joi.object({
               collectionName: Joi.string(),
               commitMessage: requiredString,
-              useWorkflow: requiredBool,
-              status: requiredString,
+              useWorkflow: Joi.bool(),
+              status: Joi.string(),
             }).required(),
           })
           .xor('entry', 'dataFiles')

@@ -33,8 +33,8 @@ export type PersistEntryParams = {
   options: {
     collectionName?: string;
     commitMessage: string;
-    useWorkflow: boolean;
-    status: string;
+    useWorkflow?: boolean;
+    status?: string;
   };
 };
 

@@ -338,7 +338,7 @@ export function localGitMiddleware({ repoPath, logger }: GitOptions) {
 
               // add status for new entries
               if (!branchExists) {
-                const description = statusToLabel(options.status, cmsLabelPrefix || '');
+                const description = statusToLabel(options.status ?? 'draft', cmsLabelPrefix || '');
                 await git.addConfig(branchDescription(cmsBranch), description);
               }
             });
