@@ -34,6 +34,7 @@ export function localFsMiddleware({ repoPath, logger }: FsOptions) {
         case 'info': {
           res.json({
             repo: path.basename(repoPath),
+            publish_modes: ['simple'],
             type: 'local_fs',
           });
           break;
