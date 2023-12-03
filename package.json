@@ -43,7 +43,7 @@
     "@types/morgan": "1.9.4",
     "@types/node": "16.18.25",
     "jest": "29.5.0",
-    "nodemon": "2.0.21",
+    "nodemon": "2.0.22",
     "prettier": "2.8.4",
     "ts-jest": "29.0.5",
     "ts-loader": "9.4.2",
